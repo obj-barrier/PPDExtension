@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #ccc;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #f4f4f4;
+    transition: background 0.3s;
+}
+
+.tab.active {
+    background: white;
+    font-weight: bold;
+    border-top: 2px solid #007bff;
+}
+
+.tab-content {
+    display: none;
+    /* 默认隐藏 */
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+
+.tab-content.active {
+    display: block;
+    /* 仅控制显示/隐藏 */
+}
+
+button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+}

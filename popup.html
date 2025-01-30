@@ -1,0 +1,36 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPD Popup</title>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+</head>
+
+<body>
+    <div class="tabs">
+        <div class="tab" data-tab="1">Chat</div>
+        <div class="tab" data-tab="2">Description</div>
+        <div class="tab" data-tab="3">Comparison</div>
+    </div>
+
+    <div class="tab-content" id="tab-1">
+        <h2>HTTP Request</h2>
+        <input type="text" id="server-url" placeholder="URL">
+        <button id="send-request">Send Request</button>
+        <p id="status">Status Code: --</p>
+        <p id="response">Response: --</p>
+    </div>
+
+    <div class="tab-content" id="tab-2">
+        <h2>Description</h2>
+        <input type="text" id="input-2" placeholder="Placeholder Text">
+    </div>
+
+    <div class="tab-content" id="tab-3">
+        <h2>Comparison</h2>
+        <input type="text" id="input-3" placeholder="Placeholder Text">
+    </div>
+
+    <script src="scripts/popup.js"></script>
+</body>
+
+</html>
