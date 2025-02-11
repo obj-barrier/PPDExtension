@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     let page_text = null;
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { action: 'getPageText' }, (response) => {
-            if (response && response.text) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "getPageText" }, (response) => {
+            if (chrome.runtime.lastError || !response) {
+                return;
+            } else {
                 page_text = response.text;
             }
         });
@@ -52,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 session_id = data.session_id;
                 // console.log("session_id: " + session_id);
+                showTab("1");
                 document.getElementById("welcome").style.display = "none";
                 document.getElementById("main").style.display = "block";
                 document.getElementById("response").textContent = `${response}${data}`;
@@ -102,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 botMessage.textContent = data[0].content;
 
                 const goButton = document.createElement("button");
-                goButton.textContent = "Go";
+                goButton.textContent = "Generate";
                 goButton.addEventListener("click", generateDescription);
 
                 botMessage.appendChild(goButton);
@@ -131,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(data => {
                 document.getElementById("response").textContent = `${response}${data}`;
-                document.getElementById("description").textContent = data[0].content;
+                document.getElementById("description").innerHTML = marked.parse(data[0].content);
                 showTab("2");
             })
             .catch(error => {
