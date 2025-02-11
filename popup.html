@@ -6,29 +6,48 @@
 </head>
 
 <body>
-    <div class="tabs">
-        <div class="tab" data-tab="1">Chat</div>
-        <div class="tab" data-tab="2">Description</div>
-        <div class="tab" data-tab="3">Comparison</div>
+    <div id="welcome">
+        <h2>Welcome, John Doe!</h2>
+        <input type="text" id="intent" style="width: 200px;" placeholder="What's on your mind today?">
+        <button id="create-session">Start Shopping</button>
     </div>
 
-    <div class="tab-content" id="tab-1">
-        <h2>HTTP Request</h2>
-        <input type="text" id="server-url" placeholder="URL">
-        <button id="send-request">Send Request</button>
-        <p id="status">Status Code: --</p>
-        <p id="response">Response: --</p>
+    <div id="main" style="display: none;">
+        <div class="tabs">
+            <div class="tab" data-tab="1">Chat</div>
+            <div class="tab" data-tab="2">Description</div>
+            <div class="tab" data-tab="3">Comparison</div>
+        </div>
+        
+        <div class="tab-content" id="tab-1">
+            <div class="chat-container">
+                <div class="chat-box" id="chat-box">
+                    <div class="message bot">
+                        To better assist you, could you please answer a few questions:<br>
+                        1. What is your price range?<br>
+                        2. Are there any specific brands or features you're looking for?<br>
+                        3. Any other details that are important to you?
+                    </div>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="user-input" placeholder="Input Message...">
+                    <button id="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tab-2">
+            <p id="description"></p>
+        </div>
+        
+        <div class="tab-content" id="tab-3">
+            <h2>Comparison</h2>
+            <input type="text" id="input-3" placeholder="Placeholder Text">
+        </div>
     </div>
 
-    <div class="tab-content" id="tab-2">
-        <h2>Description</h2>
-        <input type="text" id="input-2" placeholder="Placeholder Text">
-    </div>
-
-    <div class="tab-content" id="tab-3">
-        <h2>Comparison</h2>
-        <input type="text" id="input-3" placeholder="Placeholder Text">
-    </div>
+    <p id="status">Status Code: --</p>
+    <p id="response">Response: --</p>
 
     <script src="scripts/popup.js"></script>
 </body>

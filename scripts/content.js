@@ -1,22 +1,9 @@
-const article = document.querySelector("article");
+// 获取当前页面正文部分的纯文本（排除 HTML 标签）
+const pageText = document.body.innerText;
 
-// `document.querySelector` may return null if the selector doesn't match anything.
-if (article) {
-    const text = article.textContent;
-    const wordMatchRegExp = /[^\s]+/g; // Regular expression
-    const words = text.matchAll(wordMatchRegExp);
-    // matchAll returns an iterator, convert to array to get word count
-    const wordCount = [...words].length;
-    const readingTime = Math.round(wordCount / 200);
-    const badge = document.createElement("p");
-    // Use the same styling as the publish information in an article's header
-    badge.classList.add("color-secondary-text", "type--caption");
-    badge.textContent = `⏱️ ${readingTime} min read`;
-
-    // Support for API reference docs
-    const heading = article.querySelector("h1");
-    // Support for article docs with date
-    const date = article.querySelector("time")?.parentNode;
-
-    (date ?? heading).insertAdjacentElement("afterend", badge);
-}
+// 将文本内容发送给扩展的背景页面或者 popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'getPageText') {
+        sendResponse({ text: pageText });
+    }
+});
