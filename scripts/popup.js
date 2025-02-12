@@ -1,4 +1,23 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const user_id = 3;
+    const url = "http://127.0.0.1:5000/";
+    fetch(url + "api/users/" + user_id, {
+        method: "GET",
+    })
+        .then(response => {
+            document.getElementById("status").textContent = `${statusCode}${response.status}`;
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("response").textContent = `${response}${data}`;
+            document.getElementById("welcome-name").textContent = "Welcome, " + data.name + "!";
+        })
+        .catch(error => {
+            document.getElementById("status").textContent = `${statusCode}Error`;
+            document.getElementById("response").textContent = `${response}${error.message}`;
+        });
+    
+
     let page_text = null;
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, { action: "getPageText" }, (response) => {
@@ -31,8 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    const url = "http://127.0.0.1:5000/";
-    const user_id = 1;
     const statusCode = "Status Code: "
     const response = "Response: "
 
@@ -73,6 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function sendMessage() {
+        document.getElementById("send-btn").textContent = "Sending...";
         const inputField = document.getElementById("user-input");
         const messageText = inputField.value.trim();
         if (messageText === "") return;
@@ -95,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(data),
         })
             .then(response => {
+                document.getElementById("send-btn").textContent = "Send";
                 document.getElementById("status").textContent = `${statusCode}${response.status}`;
                 return response.json();
             })
@@ -104,11 +123,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 botMessage.classList.add("message", "bot");
                 botMessage.textContent = data[0].content;
 
-                const goButton = document.createElement("button");
-                goButton.textContent = "Generate";
-                goButton.addEventListener("click", generateDescription);
+                const genButton = document.createElement("button");
+                genButton.id = "gen-btn";
+                genButton.textContent = "Generate";
+                genButton.addEventListener("click", generateDescription);
 
-                botMessage.appendChild(goButton);
+                const btnContainer = document.createElement("div");
+
+                btnContainer.appendChild(genButton);
+                botMessage.appendChild(btnContainer);
                 chatBox.appendChild(botMessage);
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
@@ -119,6 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function generateDescription() {
+        document.getElementById("gen-btn").textContent = "Generating...";
         const api = url + "api/shopping_sessions/" + session_id + "/product_description";
         const data = {
             product_page: page_text,
@@ -130,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 document.getElementById("status").textContent = `${statusCode}${response.status}`;
+                document.getElementById("gen-btn").textContent = "Generate";
                 return response.json();
             })
             .then(data => {
