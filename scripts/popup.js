@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const user_id = 3;
     const url = "http://127.0.0.1:5000/";
+    // const url = "https://objbarrier.pythonanywhere.com/";
     fetch(url + "api/users/" + user_id, {
         method: "GET",
     })
@@ -121,17 +122,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("response").textContent = `${response}${data}`;
                 const botMessage = document.createElement("div");
                 botMessage.classList.add("message", "bot");
-                botMessage.textContent = data[0].content;
+                botMessage.innerHTML = marked.parse(data[0].content);
 
-                const genButton = document.createElement("button");
-                genButton.id = "gen-btn";
-                genButton.textContent = "Generate";
-                genButton.addEventListener("click", generateDescription);
-
-                const btnContainer = document.createElement("div");
-
-                btnContainer.appendChild(genButton);
-                botMessage.appendChild(btnContainer);
                 chatBox.appendChild(botMessage);
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
@@ -141,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    function generateDescription() {
+    document.getElementById("gen-btn").addEventListener("click", function () {
         document.getElementById("gen-btn").textContent = "Generating...";
         const api = url + "api/shopping_sessions/" + session_id + "/product_description";
         const data = {
@@ -154,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => {
                 document.getElementById("status").textContent = `${statusCode}${response.status}`;
-                document.getElementById("gen-btn").textContent = "Generate";
+                // document.getElementById("gen-btn").textContent = "Start Generating";
                 return response.json();
             })
             .then(data => {
@@ -166,5 +158,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("status").textContent = `${statusCode}Error`;
                 document.getElementById("response").textContent = `${response}${error.message}`;
             });
-    }
+    });
 });

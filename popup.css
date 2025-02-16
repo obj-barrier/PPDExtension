@@ -60,13 +60,13 @@ body {
 
 .tabs {
     display: flex;
-    border-bottom: 2px solid #ccc;
+    border-bottom: 2px solid #9d00ff;
 }
 
 .tab {
     padding: 10px 20px;
     cursor: pointer;
-    border: 1px solid #ccc;
+    border: 1px solid #9d00ff;
     border-bottom: none;
     background: #f4f4f4;
     transition: background 0.3s;
@@ -81,7 +81,7 @@ body {
 .tab-content {
     display: none;
     padding: 0px;
-    border: 1px solid #ccc;
+    border: 1px solid #9d00ff;
 }
 
 .tab-content.active {
@@ -92,14 +92,16 @@ input {
     flex: 1;
     margin-bottom: 10px;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #9d00ff;
     border-radius: 5px;
     outline: none;
+    height: 32px;
 }
 
 button {
-    padding: 8px 12px;
+    padding: 8px;
     margin-left: 5px;
+    height: 32px;
     border: none;
     background: #007bff;
     color: white;
