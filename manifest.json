@@ -4,8 +4,13 @@
     "version": "0.1",
     "description": "Personalized Product Description",
     "permissions": [
-        "activeTab"
+        "activeTab",
+        "storage"
     ],
+
+    "action": {
+        "default_popup": "popup.html"
+    },
 
     "content_scripts": [
         {
@@ -16,11 +21,7 @@
                 "scripts/content.js"
             ]
         }
-    ],
-
-    "action": {
-        "default_popup": "popup.html"
-    },
+    ],    
 
     "icons": {
         "16": "images/icon-16.png",

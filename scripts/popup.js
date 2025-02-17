@@ -32,17 +32,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const tabs = document.querySelectorAll(".tab");
     const contents = document.querySelectorAll(".tab-content");
-    let activeTab = localStorage.getItem("activeTab") || "1";
-    showTab(activeTab);
+    showTab("1");
 
     function showTab(tabId) {
         tabs.forEach(tab => tab.classList.remove("active"));
         contents.forEach(content => content.classList.remove("active"));
-
         document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add("active");
         document.getElementById(`tab-${tabId}`).classList.add("active");
-
-        localStorage.setItem("activeTab", tabId);
     }
 
     tabs.forEach(tab => {
@@ -53,8 +49,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const statusCode = "Status Code: "
     const response = "Response: "
+    const welcomeMsg = "Hi! I'm your personal shopping assistant.\nPlease tell me about your usage of the product so I can better assist you."
+    const chatBox = document.getElementById("chat-box");
 
     let session_id = null;
+    let history = [{ role: "bot", message: welcomeMsg }];
+    chrome.storage.local.get(["session_id", "history", "description"], function (data) {
+        if (data.session_id && data.history) {
+            session_id = data.session_id;
+            showTab("1");
+            document.getElementById("welcome").style.display = "none";
+            document.getElementById("main").style.display = "block";
+            chatBox.innerHTML = data.history.map(msg => {
+                const message = document.createElement("div");
+                message.classList.add("message", msg.role);
+                message.innerHTML = msg.message;
+                return message.outerHTML;
+            }).join("");
+        }
+    });
     document.getElementById("create-session").addEventListener("click", function () {
         const api = url + "api/users/" + user_id + "/shopping_sessions";
         const data = {
@@ -71,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(data => {
                 session_id = data.session_id;
+                chrome.storage.local.set({ "session_id": session_id });
                 // console.log("session_id: " + session_id);
                 showTab("1");
                 document.getElementById("welcome").style.display = "none";
@@ -95,11 +109,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const inputField = document.getElementById("user-input");
         const messageText = inputField.value.trim();
         if (messageText === "") return;
-
-        const chatBox = document.getElementById("chat-box");
+        
         const userMessage = document.createElement("div");
         userMessage.classList.add("message", "user");
         userMessage.textContent = messageText;
+        history.push({ role: "user", message: messageText });
+        chrome.storage.local.set({ "history": history });
         chatBox.appendChild(userMessage);
 
         inputField.value = "";
@@ -123,6 +138,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const botMessage = document.createElement("div");
                 botMessage.classList.add("message", "bot");
                 botMessage.innerHTML = marked.parse(data[0].content);
+                history.push({ role: "bot", message: botMessage.innerHTML });
+                chrome.storage.local.set({ "history": history });
 
                 chatBox.appendChild(botMessage);
                 chatBox.scrollTop = chatBox.scrollHeight;
@@ -158,5 +175,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("status").textContent = `${statusCode}Error`;
                 document.getElementById("response").textContent = `${response}${error.message}`;
             });
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", function () {
+        session_id = null;
+        history = [welcomeMsg];
+        chrome.storage.local.remove("session_id");
+        chrome.storage.local.remove("history");
+        document.getElementById("welcome").style.display = "block";
+        document.getElementById("main").style.display = "none";
     });
 });
