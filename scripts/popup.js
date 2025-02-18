@@ -1,23 +1,81 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const user_id = 3;
-    const url = "http://127.0.0.1:5000/";
-    // const url = "https://objbarrier.pythonanywhere.com/";
-    fetch(url + "api/users/" + user_id, {
-        method: "GET",
-    })
-        .then(response => {
-            document.getElementById("status").textContent = `${statusCode}${response.status}`;
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById("response").textContent = `${response}${data}`;
-            document.getElementById("welcome-name").textContent = "Welcome, " + data.name + "!";
-        })
-        .catch(error => {
-            document.getElementById("status").textContent = `${statusCode}Error`;
-            document.getElementById("response").textContent = `${response}${error.message}`;
+    let user_id = null;
+
+    document.getElementById("user1").addEventListener("click", function () {
+        user_id = 1;
+        login();
+    });
+    document.getElementById("user2").addEventListener("click", function () {
+        user_id = 2;
+        login();
+    });
+    document.getElementById("user3").addEventListener("click", function () {
+        user_id = 3;
+        login();
+    });
+
+    const statusCode = "Status Code: "
+    const response = "Response: "
+    const welcomeMsg = "Hi! I'm your personal shopping assistant.\nPlease tell me about your usage of the product so I can better assist you."
+    // const url = "http://127.0.0.1:5000/";
+    const url = "https://objbarrier.pythonanywhere.com/";
+    const chatBox = document.getElementById("chat-box");
+
+    let session_id = null;
+    let history = [{ role: "bot", message: welcomeMsg }];
+
+    function login() {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("welcome").style.display = "block";
+        
+        chrome.storage.local.get(["user_id", "session_id", "history"], function (data) {
+            if (data.user_id) {
+                if (data.user_id !== user_id) {
+                    chrome.storage.local.clear();
+                    chrome.storage.local.set({ "user_id": user_id });
+                    chrome.storage.local.set({ "history": history });
+                    return;
+                }
+            } else {
+                chrome.storage.local.set({ "user_id": user_id });
+            }
+
+            if (data.history) {
+                history = data.history;
+            } else {
+                chrome.storage.local.set({ "history": history });
+            }
+
+            if (data.session_id) {
+                session_id = data.session_id;
+                showTab("1");
+                document.getElementById("welcome").style.display = "none";
+                document.getElementById("main").style.display = "block";
+                chatBox.innerHTML = data.history.map(msg => {
+                    const message = document.createElement("div");
+                    message.classList.add("message", msg.role);
+                    message.innerHTML = msg.message;
+                    return message.outerHTML;
+                }).join("");
+            } else {
+                fetch(url + "api/users/" + user_id, {
+                    method: "GET",
+                })
+                    .then(response => {
+                        document.getElementById("status").textContent = `${statusCode}${response.status}`;
+                        return response.json();
+                    })
+                    .then(data => {
+                        document.getElementById("response").textContent = `${response}${data}`;
+                        document.getElementById("welcome-name").textContent = "Welcome, " + data.name + "!";
+                    })
+                    .catch(error => {
+                        document.getElementById("status").textContent = `${statusCode}Error`;
+                        document.getElementById("response").textContent = `${response}${error.message}`;
+                    });
+            }
         });
-    
+    }
 
     let page_text = null;
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -47,27 +105,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    const statusCode = "Status Code: "
-    const response = "Response: "
-    const welcomeMsg = "Hi! I'm your personal shopping assistant.\nPlease tell me about your usage of the product so I can better assist you."
-    const chatBox = document.getElementById("chat-box");
-
-    let session_id = null;
-    let history = [{ role: "bot", message: welcomeMsg }];
-    chrome.storage.local.get(["session_id", "history", "description"], function (data) {
-        if (data.session_id && data.history) {
-            session_id = data.session_id;
-            showTab("1");
-            document.getElementById("welcome").style.display = "none";
-            document.getElementById("main").style.display = "block";
-            chatBox.innerHTML = data.history.map(msg => {
-                const message = document.createElement("div");
-                message.classList.add("message", msg.role);
-                message.innerHTML = msg.message;
-                return message.outerHTML;
-            }).join("");
-        }
-    });
     document.getElementById("create-session").addEventListener("click", function () {
         const api = url + "api/users/" + user_id + "/shopping_sessions";
         const data = {
@@ -179,9 +216,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("reset-btn").addEventListener("click", function () {
         session_id = null;
-        history = [welcomeMsg];
+        history = [{ role: "bot", message: welcomeMsg }];
         chrome.storage.local.remove("session_id");
-        chrome.storage.local.remove("history");
+        chrome.storage.local.set({ "history": history });
         document.getElementById("welcome").style.display = "block";
         document.getElementById("main").style.display = "none";
     });
