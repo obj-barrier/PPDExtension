@@ -1,22 +1,48 @@
-// // 获取所有的链接
-// const links = document.querySelectorAll('a.a-link-normal._product-comparison-desktop_linkComponentStyle_visibleFocus__1lPQm');
-
-// // 提取前5个链接的 href
-// const firstFiveLinks = Array.from(links).slice(0, 5).map(link => link.href);
-
-// // 在控制台输出
-// console.log(firstFiveLinks);
-
-// const comparisonDiv = document.querySelector("div._product-comparison-desktop_desktopFaceoutStyle_comparison-card-wrapper__udgEs");
-// const textContent = comparisonDiv ? comparisonDiv.innerText : "";
-// console.log(textContent);
-
-// 获取当前页面正文部分的纯文本（排除 HTML 标签）
-const pageText = document.body.innerText;
-
-// 将文本内容发送给扩展的背景页面或者 popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'getPageText') {
-        sendResponse({ text: pageText });
+const prodID = window.location.href.match(/dp\/([^\/?]*)/)[1];
+const prodIDKey = `desc_${prodID}`;
+chrome.storage.local.get(["user_id", "session_id", prodIDKey], async function (stored) {
+    if (!stored.user_id || !stored.session_id) {
+        return;
     }
+
+    const genMessage = document.createElement("div");
+    genMessage.style.color = "red";
+    const regenBtn = document.createElement("button");
+    regenBtn.textContent = "Regenerate";
+    regenBtn.addEventListener("click", generate);
+    const title = document.getElementById("title");
+    title.appendChild(genMessage);
+    title.appendChild(regenBtn);
+
+    if (stored[prodIDKey]) {
+        genMessage.textContent = "Already has description!";
+        return;
+    }
+    generate();
+
+    function generate() {
+        regenBtn.disabled = true;
+        chrome.storage.local.remove(`desc_${prodID}`);
+        genMessage.textContent = "Generating product description...";
+
+        const api = "http://127.0.0.1:5000/api/";
+        // const api = "https://dk1414.pythonanywhere.com/api/";
+        fetch(`${api}shopping_sessions/${stored.session_id}/product_description`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ product_page: document.body.innerText }),
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                chrome.storage.local.set({ [`desc_${prodID}`]: data[0].content });
+                genMessage.textContent = "Generation complete!";
+                regenBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error(error.message);
+            });
+    }
+    
 });

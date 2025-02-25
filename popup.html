@@ -7,21 +7,38 @@
 
 <body>
     <div id="login">
-        <h2>Select User</h2>
-        <div class="input-box">
-            <button style="flex: 1;" id="user1">Maya</button>
-            <button style="flex: 1;" id="user2">Stan</button>
-            <button style="flex: 1;" id="user3">Alex</button>
+        <h2>Login / Register</h2>
+        <div>
+            <div>Email</div>
+            <input type="text" id="email" placeholder="Email">
+            <div>Password</div>
+            <input type="password" id="password" placeholder="Password">
+            <button id="login-btn">Login</button>
+            <button id="reg-btn">Register</button>
+            <div id="register" style="display: none">
+                <div>Confirm Password</div>
+                <input type="password" id="confirm-pwd" placeholder="Confirm Password">
+                <div>Full Name</div>
+                <input type="text" id="full-name" placeholder="John Doe">
+                <div>Birthday</div>
+                <input type="text" id="birthday" placeholder="MM/DD/YYYY">
+                <div>Occupation</div>
+                <input type="text" id="occupation" placeholder="MSCS Student at NU">
+                <div>ZIP code</div>
+                <input type="text" id="zipcode" placeholder="60201">
+                <button id="submit-btn">Register</button>
+            </div>
         </div>
     </div>
 
-    <div id="welcome" style="display: none;">
+    <div id="welcome" style="display: none">
         <h2 id="wel-label">Welcome, John Doe!</h2>
-        <input type="text" id="intent" style="width: 200px;" placeholder="What's on your mind today?">
+        <input type="text" id="intent" style="width: 200px" placeholder="What's on your mind today?">
         <button id="create-session">Start Shopping</button>
+        <button id="logout-btn">Logout</button>
     </div>
 
-    <div id="main" style="display: none;">
+    <div id="main" style="display: none">
         <div class="tabs">
             <div class="tab" data-tab="1">Chat</div>
             <div class="tab" data-tab="2">Description</div>
@@ -36,20 +53,21 @@
                     <button id="send-btn">Send</button>
                 </div>
                 <div class="input-box">
-                    <button style="flex: 1;" id="reset-btn">Start New Session</button>
-                    <button style="flex: 1;" id="gen-btn">Start Generating</button>
+                    <button style="flex: 1" id="reset-btn">Start New Session</button>
                 </div>
             </div>
         </div>
 
         <div class="tab-content" id="tab-2">
-            <div class="description" id="description">
-                Chat to generate description...
+            <div class="markdown-box" id="description">
+                Open a product page to generate description.
             </div>
         </div>
 
         <div class="tab-content" id="tab-3">
-            <h2>Comparison TBD</h2>
+            <div class="markdown-box" id="comparison">
+                Open some product pages to generate comparison.
+            </div>
         </div>
     </div>
 

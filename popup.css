@@ -22,7 +22,7 @@ body {
     flex-direction: column;
 }
 
-.description {
+.markdown-box {
     height: 450px;
     width: 600px;
     max-width: 100%;
