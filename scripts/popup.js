@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     const statusHead = "Status Code: ";
     const responseHead = "Response: ";
     const welcomeMsg = "Hi! I'm your personal shopping assistant.\nPlease tell me about your usage of the product so I can better assist you.";
-    const api = "http://127.0.0.1:5000/api/";
-    // const api = "https://dk1414.pythonanywhere.com/api/";
+    // const api = "http://127.0.0.1:5000/api/";
+    const api = "https://dk1414.pythonanywhere.com/api/";
 
     const loginPanel = document.getElementById("login");
     const welPanel = document.getElementById("welcome");
@@ -36,6 +36,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     let full_name = stored.full_name;
     let session_id = null;
     let history = [{ role: "bot", message: welcomeMsg }];
+
+    function loadHistory() {
+        chatBox.innerHTML = history.map(msg => {
+            const message = document.createElement("div");
+            message.classList.add("message", msg.role);
+            message.innerHTML = msg.message;
+            return message.outerHTML;
+        }).join("");
+    }
 
     if (user_id) {
         loginPanel.style.display = "none";
@@ -82,12 +91,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             welPanel.style.display = "block";
         }
 
-        chatBox.innerHTML = history.map(msg => {
-            const message = document.createElement("div");
-            message.classList.add("message", msg.role);
-            message.innerHTML = msg.message;
-            return message.outerHTML;
-        }).join("");
+        loadHistory();
     }
 
     document.getElementById("login-btn").addEventListener("click", function () {
@@ -116,8 +120,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 responseLabel.textContent = `${responseHead}${JSON.stringify(data)}`;
                 user_id = data.user_id;
                 full_name = data.name;
-                history = [{ role: "bot", message: welcomeMsg }]
-                chrome.storage.local.set({ "user_id": user_id, "full_name": full_name, history: history });
+                chrome.storage.local.set({ "user_id": user_id, "full_name": full_name });
                 loginPanel.style.display = "none";
                 welPanel.style.display = "block";
                 welLabel.textContent = `Welcome, ${full_name} !`;
@@ -165,8 +168,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 responseLabel.textContent = `${responseHead}${JSON.stringify(data)}`;
                 user_id = data.user_id;
                 full_name = data.name;
-                history = [{ role: "bot", message: welcomeMsg }]
-                chrome.storage.local.set({ "user_id": user_id, "full_name": full_name, history: history });
+                chrome.storage.local.set({ "user_id": user_id, "full_name": full_name });
                 loginPanel.style.display = "none";
                 welPanel.style.display = "block";
                 welLabel.textContent = `Welcome, ${full_name} !`;
@@ -201,6 +203,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("create-session").addEventListener("click", function () {
         history = [{ role: "bot", message: welcomeMsg }];
         chrome.storage.local.set({ "history": history });
+        loadHistory();
 
         fetch(`${api}users/${user_id}/shopping_sessions`, {
             method: "POST",

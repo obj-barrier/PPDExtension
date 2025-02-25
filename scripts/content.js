@@ -25,8 +25,8 @@ chrome.storage.local.get(["user_id", "session_id", prodIDKey], async function (s
         chrome.storage.local.remove(`desc_${prodID}`);
         genMessage.textContent = "Generating product description...";
 
-        const api = "http://127.0.0.1:5000/api/";
-        // const api = "https://dk1414.pythonanywhere.com/api/";
+        // const api = "http://127.0.0.1:5000/api/";
+        const api = "https://dk1414.pythonanywhere.com/api/";
         fetch(`${api}shopping_sessions/${stored.session_id}/product_description`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
