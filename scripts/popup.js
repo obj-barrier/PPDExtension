@@ -1,3 +1,25 @@
+function jsonToHtmlTable(json) {
+    const table_headers = json.table_headers;
+    const table_rows = json.table_rows;
+
+    let html = '<table border="1">\n';
+    html += '  <tr>\n';
+    table_headers.forEach(header => {
+        html += `    <th>${header}</th>\n`;
+    });
+    html += '  </tr>\n';
+    table_rows.forEach(row => {
+        html += '  <tr>\n';
+        table_headers.forEach(header => {
+            html += `    <td>${row[header] || 'value'}</td>\n`;
+        });
+        html += '  </tr>\n';
+    });
+    html += '</table>';
+
+    return html;
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
     const tabs = document.querySelectorAll(".tab");
     const contents = document.querySelectorAll(".tab-content");
@@ -26,6 +48,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const chatBox = document.getElementById("chat-box");
     const descBox = document.getElementById("description");
     const compBox = document.getElementById("comparison");
+    const compBtn = document.getElementById("comp-btn");
     const statusLabel = document.getElementById("status");
     const responseLabel = document.getElementById("response");
 
@@ -52,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (stored.session_id) {
             session_id = stored.session_id;
+            compBtn.disabled = false;
             showTab("1");
             mainPanel.style.display = "block";
             if (stored.history) {
@@ -61,33 +85,19 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                const prodID = tabs[0].url.match(/dp\/([^\/?]*)/)[1];
-                chrome.storage.local.get(`desc_${prodID}`, function (stored_desc) {
-                    if (stored_desc) {
-                        descBox.innerHTML = marked.parse(stored_desc[`desc_${prodID}`]);
-                        showTab("2");
-                    }
-                });
+                const prodID = tabs[0].url.match(/dp\/([^\/?]*)/);
+                if (prodID) {
+                    const prodIDKey = `desc_${prodID[1]}`;
+                    chrome.storage.local.get(prodIDKey, function (stored_desc) {
+                        if (stored_desc) {
+                            descBox.innerHTML = marked.parse(stored_desc[prodIDKey]);
+                            showTab("2");
+                        }
+                    });
+                }
             });
-
-            fetch(`${api}shopping_sessions/${session_id}/product_comparison`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({}),
-            })
-                .then(response => {
-                    statusLabel.textContent = `${statusHead}${response.status}`;
-                    return response.json();
-                })
-                .then(data => {
-                    responseLabel.textContent = `${responseHead}${JSON.stringify(data)}`;
-                    compBox.textContent = data[0].content;
-                })
-                .catch(error => {
-                    statusLabel.textContent = `${statusHead}Error`;
-                    responseLabel.textContent = `${responseHead}${error.message}`;
-                });
         } else {
+            compBtn.disabled = true;
             welPanel.style.display = "block";
         }
 
@@ -211,20 +221,21 @@ document.addEventListener("DOMContentLoaded", async function () {
             body: JSON.stringify({ intent: document.getElementById("intent").value.trim() }),
         })
             .then(response => {
-                statusLabel.textContent = statusHead + response.status;
+                statusLabel.textContent = `${statusHead}${response.status}`;
                 return response.json();
             })
             .then(data => {
+                responseLabel.textContent = `${responseHead}${JSON.stringify(data)}`;
                 session_id = data.session_id;
                 chrome.storage.local.set({ "session_id": session_id });
+                compBtn.disabled = false;
                 showTab("1");
                 welPanel.style.display = "none";
                 mainPanel.style.display = "block";
-                responseLabel.textContent = responseHead + JSON.stringify(data);
             })
             .catch(error => {
-                statusLabel.textContent = statusHead + "Error";
-                responseLabel.textContent = responseHead + error.message;
+                statusLabel.textContent = `${statusHead}Error`;
+                responseLabel.textContent = `${responseHead}${error.message}`;
             });
     });
 
@@ -271,7 +282,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return response.json();
             })
             .then(data => {
-                responseLabel.textContent = responseHead + Object.keys(data[0]) + " " + data[0].created_at;
+                responseLabel.textContent = `${responseHead}${Object.keys(data[0])} ${data[0].created_at}`;
                 const botMessage = document.createElement("div");
                 botMessage.classList.add("message", "bot");
                 botMessage.innerHTML = marked.parse(data[0].content);
@@ -282,17 +293,42 @@ document.addEventListener("DOMContentLoaded", async function () {
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
             .catch(error => {
-                statusLabel.textContent = statusHead + "Error";
-                responseLabel.textContent = responseHead + error.message;
+                statusLabel.textContent = `${statusHead}Error`;
+                responseLabel.textContent = `${responseHead}${error.message}`;
             });
     }
 
     document.getElementById("reset-btn").addEventListener("click", function () {
         session_id = null;
-        chrome.storage.local.remove("session_id");
+        chrome.storage.local.clear();
         history = [{ role: "bot", message: welcomeMsg }];
-        chrome.storage.local.set({ "history": history });
+        chrome.storage.local.set({ "user_id": user_id, "full_name": full_name, "history": history });
         document.getElementById("welcome").style.display = "block";
         mainPanel.style.display = "none";
+    });
+
+    compBtn.addEventListener("click", function () {
+        compBtn.disabled = true;
+        compBtn.textContent = "Generating...";
+        fetch(`${api}shopping_sessions/${session_id}/product_comparison`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({}),
+        })
+            .then(response => {
+                statusLabel.textContent = `${statusHead}${response.status}`;
+                return response.json();
+            })
+            .then(data => {
+                responseLabel.textContent = `${responseHead}${Object.keys(data[0])}`;
+                compBox.textContent = data[0].content;
+                compBox.innerHTML = jsonToHtmlTable(JSON.parse(data[0].content));
+                compBtn.textContent = "Generate / Update Comparison";
+                compBtn.disabled = false;
+            })
+            .catch(error => {
+                statusLabel.textContent = `${statusHead}Error`;
+                responseLabel.textContent = `${responseHead}${error.message}`;
+            });
     });
 });
