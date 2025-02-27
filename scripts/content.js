@@ -25,10 +25,10 @@ if (prodID) {
         function generate() {
             regenBtn.disabled = true;
             chrome.storage.local.remove(prodIDKey);
-            genMessage.textContent = 'Generating product description...';
+            genMessage.textContent = 'Generating description...';
 
-            // const api = 'http://127.0.0.1:5000/api/';
-            const api = 'https://dk1414.pythonanywhere.com/api/';
+            const api = 'http://127.0.0.1:5000/api/';
+            // const api = 'https://dk1414.pythonanywhere.com/api/';
             fetch(`${api}shopping_sessions/${stored.session_id}/product_description`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -39,6 +39,16 @@ if (prodID) {
                 })
                 .then(data => {
                     chrome.storage.local.set({ [prodIDKey]: data[0].content });
+                    genMessage.textContent = 'Generating comparison...';
+                    return fetch(`${api}shopping_sessions/${stored.session_id}/product_comparison`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({}),
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    chrome.storage.local.set({ 'comparison': JSON.parse(data[0].content) });
                     genMessage.textContent = 'Generation complete!';
                     regenBtn.disabled = false;
                 })
