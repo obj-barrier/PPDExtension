@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const mainPanel = document.getElementById('main');
     const chatBox = document.getElementById('chat-box');
     const descBox = document.getElementById('description');
+    const summaryBox = document.getElementById('summary');
     const compBox = document.getElementById('comparison');
     const compBtn = document.getElementById('comp-btn');
     const statusLabel = document.getElementById('status');
@@ -97,7 +98,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
             });
 
-            if (stored.comparison) {
+            const comparison = stored.comparison;
+            if (comparison) {
+                console.log(comparison);
+                summaryBox.textContent = comparison.commentary;
                 compBox.innerHTML = jsonToHtmlTable(stored.comparison);
             }
         } else {
@@ -324,10 +328,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 return response.json();
             })
             .then(data => {
-                chrome.storage.local.set({ 'comparison': JSON.parse(data[0].content) });
+                const comparison = JSON.parse(data[0].content);
+                chrome.storage.local.set({ 'comparison': comparison });
                 responseLabel.textContent = `${responseHead}${Object.keys(data[0])}`;
-                compBox.textContent = data[0].content;
-                compBox.innerHTML = jsonToHtmlTable(JSON.parse(data[0].content));
+                summaryBox.textContent = comparison.commentary;
+                compBox.innerHTML = jsonToHtmlTable(comparison);
                 compBtn.textContent = 'Generate / Update Comparison';
                 compBtn.disabled = false;
             })
