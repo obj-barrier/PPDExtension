@@ -2,8 +2,12 @@ const prodID = window.location.href.match(/(dp|d|product-reviews|offer-listing)\
 if (prodID) {
     let descBox = document.getElementById('feature-bullets');
     if (!descBox) {
+        descBox = document.getElementById('productFactsDesktopExpander');
+    }
+    if (!descBox) {
         descBox = document.getElementById('centerCol');
     }
+
     if (descBox) {
         const origDesc = descBox.innerHTML;
 
