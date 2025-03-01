@@ -2,7 +2,7 @@ const prodID = window.location.href.match(/(dp|d|product-reviews|offer-listing)\
 if (prodID) {
     let descBox = document.getElementById('feature-bullets');
     if (!descBox) {
-        descBox = document.getElementById('productFactsDesktopExpander');
+        descBox = document.getElementById('productFactsDesktop_feature_div');
     }
     if (!descBox) {
         descBox = document.getElementById('centerCol');
