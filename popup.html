@@ -8,37 +8,36 @@
 <body>
     <div id="login">
         <h2>Login / Register</h2>
-        <div>
-            <div>Email</div>
-            <input type="text" id="email" placeholder="Email">
-            <div>Password</div>
-            <input type="password" id="password" placeholder="Password">
-            <button id="login-btn">Login</button>
-            <button id="reg-btn">Register</button>
-            <div id="register" style="display: none">
-                <div>Confirm Password</div>
-                <input type="password" id="confirm-pwd" placeholder="Confirm Password">
-                <div>Full Name</div>
-                <input type="text" id="full-name" placeholder="John Doe">
-                <div>Birthday</div>
-                <input type="text" id="birthday" placeholder="MM/DD/YYYY">
-                <div>Occupation</div>
-                <input type="text" id="occupation" placeholder="MSCS Student at NU">
-                <div>ZIP code</div>
-                <input type="text" id="zipcode" placeholder="60201">
-                <button id="submit-btn">Register</button>
-            </div>
+        <div>Email</div>
+        <input type="text" id="email" placeholder="Email">
+        <div>Password</div>
+        <input type="password" id="password" placeholder="Password">
+        <button id="login-btn">Login</button>
+        <button id="reg-btn">Register</button>
+        <div id="register" style="display: none;">
+            <div>Confirm Password</div>
+            <input type="password" id="confirm-pwd" placeholder="Confirm Password">
+            <div>Full Name</div>
+            <input type="text" id="full-name" placeholder="John Doe">
+            <div>Birthday</div>
+            <input type="text" id="birthday" placeholder="MM/DD/YYYY">
+            <div>Occupation</div>
+            <input type="text" id="occupation" placeholder="MSCS Student at NU">
+            <div>ZIP code</div>
+            <input type="text" id="zipcode" placeholder="60201">
+            <button id="submit-btn">Register</button>
         </div>
+        <label id="error-msg" style="color: red;"></label>
     </div>
 
-    <div id="welcome" style="display: none">
+    <div id="welcome" style="display: none;">
         <h2 id="wel-label">Welcome, John Doe!</h2>
-        <input type="text" id="intent" style="width: 200px" placeholder="What's on your mind today?">
+        <input type="text" id="intent" style="width: 200px;" placeholder="What's on your mind today?">
         <button id="create-session">Start Shopping</button>
         <button id="logout-btn">Logout</button>
     </div>
 
-    <div id="main" style="display: none">
+    <div id="main" style="display: none;">
         <div class="tabs">
             <div class="tab" data-tab="1">Chat</div>
             <div class="tab" data-tab="2">Description</div>
@@ -53,24 +52,23 @@
                     <button id="send-btn">Send</button>
                 </div>
                 <div class="input-box">
-                    <button style="flex: 1" id="reset-btn">Start New Session</button>
+                    <button style="flex: 1;" id="reset-btn">End Shopping Session</button>
                 </div>
             </div>
         </div>
 
         <div class="tab-content" id="tab-2">
-            <div class="markdown-box" id="description">
-                Open a product page to generate description.
+            <div class="markdown-box" id="description" style="font-size: large;">
+                Open a product page to generate a description.
             </div>
         </div>
 
         <div class="tab-content" id="tab-3">
-            
             <div class="markdown-box">
-                <p id="summary">Open some product pages and then click the button to generate comparison.</p>
+                <p id="summary" style="font-size: large;">Open some product pages to generate a comparison.</p>
                 <div id="comparison"></div>
             </div>
-            <button id="comp-btn" disabled>Generate / Update Comparison</button>
+            <button id="comp-btn" style="display: block; margin: 5px auto;" disabled>Update Comparison</button>
         </div>
     </div>
 

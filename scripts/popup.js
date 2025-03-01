@@ -38,14 +38,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     const statusHead = 'Status Code: ';
     const responseHead = 'Response: ';
     const welcomeMsg = "Hi! I'm your personal shopping assistant.\nPlease tell me about your usage of the product so I can better assist you.";
-    const api = 'http://127.0.0.1:5000/api/';
-    // const api = 'https://dk1414.pythonanywhere.com/api/';
+    // const api = 'http://127.0.0.1:5000/api/';
+    const api = 'https://dk1414.pythonanywhere.com/api/';
 
     const loginPanel = document.getElementById('login');
+    const ErrorMsg = document.getElementById('error-msg');
     const welPanel = document.getElementById('welcome');
     const welLabel = document.getElementById('wel-label');
     const mainPanel = document.getElementById('main');
     const chatBox = document.getElementById('chat-box');
+    const sendBtn = document.getElementById('send-btn');
     const descBox = document.getElementById('description');
     const summaryBox = document.getElementById('summary');
     const compBox = document.getElementById('comparison');
@@ -68,11 +70,14 @@ document.addEventListener('DOMContentLoaded', async function () {
             message.innerHTML = msg.message;
             return message.outerHTML;
         }).join('');
+        const hint = document.createElement('div');
+        hint.textContent = 'Newly opened product pages will have personalized descriptions. You can chat more and regenerate anytime!'
+        chatBox.appendChild(hint);
     }
 
     if (user_id) {
         loginPanel.style.display = 'none';
-        welLabel.textContent = `Welcome, ${full_name} !`;
+        welLabel.textContent = `Welcome, ${full_name}!`;
 
         if (stored.session_id) {
             session_id = stored.session_id;
@@ -86,9 +91,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
             chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                const prodID = tabs[0].url.match(/dp\/([^\/?]*)/);
+                const prodID = tabs[0].url.match(/(dp|d|product-reviews|offer-listing)\/([A-Z0-9]{10})/);
                 if (prodID) {
-                    const prodIDKey = `desc_${prodID[1]}`;
+                    const prodIDKey = `desc_${prodID[2]}`;
                     chrome.storage.local.get(prodIDKey, function (stored_desc) {
                         if (stored_desc) {
                             descBox.innerHTML = marked.parse(stored_desc[prodIDKey]);
@@ -113,9 +118,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     document.getElementById('login-btn').addEventListener('click', function () {
+        ErrorMsg.textContent = '';
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         if (email === '' || password === '') {
+            ErrorMsg.textContent = 'Empty email / password!';
             return;
         }
 
@@ -130,6 +137,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             .then(response => {
                 statusLabel.textContent = `${statusHead}${response.status}`;
                 if (!response.ok) {
+                    ErrorMsg.textContent = 'Incorrect email / password!';
                     throw new Error(`${response.status} - Incorrect Email or Password`);
                 }
                 return response.json();
@@ -141,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 chrome.storage.local.set({ 'user_id': user_id, 'full_name': full_name });
                 loginPanel.style.display = 'none';
                 welPanel.style.display = 'block';
-                welLabel.textContent = `Welcome, ${full_name} !`;
+                welLabel.textContent = `Welcome, ${full_name}!`;
             })
             .catch(error => {
                 statusLabel.textContent = `${statusHead}Error`;
@@ -156,9 +164,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     document.getElementById('submit-btn').addEventListener('click', function () {
+        ErrorMsg.textContent = '';
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         if (password !== document.getElementById('confirm-pwd').value) {
+            ErrorMsg.textContent = 'Confirm password does not match!';
             return;
         }
         const inputName = document.getElementById('full-name').value.trim();
@@ -166,6 +176,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const occupation = document.getElementById('occupation').value;
         const zipcode = document.getElementById('zipcode').value;
         if (email === '' || password === '' || inputName === '' || birthday === '' || occupation === '' || zipcode === '') {
+            ErrorMsg.textContent = 'Please fill in every blank!';
             return;
         }
 
@@ -189,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 chrome.storage.local.set({ 'user_id': user_id, 'full_name': full_name });
                 loginPanel.style.display = 'none';
                 welPanel.style.display = 'block';
-                welLabel.textContent = `Welcome, ${full_name} !`;
+                welLabel.textContent = `Welcome, ${full_name}!`;
 
                 return fetch(`${api}users/${user_id}/preferences`, {
                     method: 'POST',
@@ -258,7 +269,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         mainPanel.style.display = 'none';
     });
 
-    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    sendBtn.addEventListener('click', sendMessage);
     document.getElementById('user-input').addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
             sendMessage();
@@ -266,10 +277,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     function sendMessage() {
-        document.getElementById('send-btn').textContent = 'Sending...';
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending...';
         const inputField = document.getElementById('user-input');
         const messageText = inputField.value.trim();
         if (messageText === '') return;
+        inputField.value = '';
         
         const userMessage = document.createElement('div');
         userMessage.classList.add('message', 'user');
@@ -278,15 +291,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         chrome.storage.local.set({ 'history': history });
         chatBox.appendChild(userMessage);
 
-        inputField.value = '';
         fetch(`${api}shopping_sessions/${session_id}/messages`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: messageText }),
         })
             .then(response => {
-                document.getElementById('send-btn').textContent = 'Send';
-                statusLabel.textContent = statusHead + response.status;
+                statusLabel.textContent = `${statusHead}${response.status}`;
                 return response.json();
             })
             .then(data => {
@@ -299,6 +310,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
                 chatBox.appendChild(botMessage);
                 chatBox.scrollTop = chatBox.scrollHeight;
+                sendBtn.textContent = 'Send';
+                sendBtn.disabled = false;
             })
             .catch(error => {
                 statusLabel.textContent = `${statusHead}Error`;
@@ -333,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 responseLabel.textContent = `${responseHead}${Object.keys(data[0])}`;
                 summaryBox.textContent = comparison.commentary;
                 compBox.innerHTML = jsonToHtmlTable(comparison);
-                compBtn.textContent = 'Generate / Update Comparison';
+                compBtn.textContent = 'Update Comparison';
                 compBtn.disabled = false;
             })
             .catch(error => {
