@@ -1,6 +1,12 @@
 const prodID = window.location.href.match(/(dp|d|product-reviews|offer-listing)\/([A-Z0-9]{10})/);
 if (prodID) {
-    const descBox = document.getElementById('feature-bullets');
+    let descBox = document.getElementById('feature-bullets');
+    if (!descBox) {
+        descBox = document.getElementById('centerCol');
+    }
+    if (!descBox) {
+        return;
+    }
     const origDesc = descBox.innerHTML;
 
     const prodIDKey = `desc_${prodID[2]}`;
