@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (prodID) {
                     const prodIDKey = `desc_${prodID[2]}`;
                     chrome.storage.local.get(prodIDKey, function (stored_desc) {
-                        if (stored_desc) {
+                        if (stored_desc[prodIDKey]) {
                             descBox.innerHTML = marked.parse(stored_desc[prodIDKey]);
                             showTab('2');
                         }
