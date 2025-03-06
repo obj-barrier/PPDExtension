@@ -4,7 +4,7 @@
     padding: 10px;
 }
 
-button {
+.regen-btn {
     padding: 8px;
     height: 32px;
     border: none;
@@ -14,18 +14,24 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+.regen-btn:hover {
+    padding: 8px;
+    height: 32px;
+    border: none;
     background: #6e00b3;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-button:disabled {
+.regen-btn:disabled {
+    padding: 8px;
+    height: 32px;
+    border: none;
     background: #b37ad9;
     color: #f0e6f6;
+    border-radius: 5px;
     cursor: not-allowed;
     opacity: 0.6;
     box-shadow: none;
-}
-
-button:disabled:hover {
-    background: #b37ad9;
 }

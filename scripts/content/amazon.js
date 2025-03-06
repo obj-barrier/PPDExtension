@@ -23,6 +23,7 @@ if (prodID) {
             genMessage.style.color = 'red';
 
             const regenBtn = document.createElement('button');
+            regenBtn.classList.add('regen-btn');
             regenBtn.textContent = 'Regenerate';
             regenBtn.addEventListener('click', generate);
 
