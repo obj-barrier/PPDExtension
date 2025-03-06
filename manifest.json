@@ -14,9 +14,28 @@
 
     "content_scripts": [
         {
-            "matches": ["https://www.amazon.com/*"],
-            "css": ["content.css"],
-            "js": ["scripts/content.js", "libs/marked.min.js"]
+            "matches": [
+                "https://www.amazon.com/*"
+            ],
+            "css": [
+                "content.css"
+            ],
+            "js": [
+                "scripts/content/amazon.js",
+                "libs/marked.min.js"
+            ]
+        },
+        {
+            "matches": [
+                "https://shop.asus.com/*"
+            ],
+            "css": [
+                "content.css"
+            ],
+            "js": [
+                "scripts/content/asus.js",
+                "libs/marked.min.js"
+            ]
         }
     ],
 
