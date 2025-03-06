@@ -18,7 +18,7 @@
                 "https://www.amazon.com/*"
             ],
             "css": [
-                "content.css"
+                "scripts/content.css"
             ],
             "js": [
                 "scripts/content/amazon.js",
@@ -30,7 +30,7 @@
                 "https://shop.asus.com/*"
             ],
             "css": [
-                "content.css"
+                "scripts/content.css"
             ],
             "js": [
                 "scripts/content/asus.js",

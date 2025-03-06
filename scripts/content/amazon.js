@@ -1,23 +1,38 @@
 const prodID = window.location.href.match(/(dp|d|product-reviews|offer-listing)\/([A-Z0-9]{10})/);
 if (prodID) {
-    let descBox = document.getElementById('feature-bullets');
-    if (!descBox) {
-        descBox = document.getElementById('productFactsDesktop_feature_div');
-    }
-    if (!descBox) {
-        descBox = document.getElementById('centerCol');
+    let descBox;
+    getDescBox();
+
+    function getDescBox() {
+        descBox = document.getElementById('feature-bullets');
+        if (!descBox) {
+            descBox = document.getElementById('productFactsDesktop_feature_div');
+        }
+        if (!descBox) {
+            descBox = document.getElementById('centerCol');
+        }
     }
 
     if (descBox) {
-        const origDesc = descBox.innerHTML;
-
         const prodIDKey = `desc_${prodID[2]}`;
         chrome.storage.local.get(['user_id', 'session_id', prodIDKey], async function (stored) {
             if (!stored.user_id || !stored.session_id) {
                 return;
             }
 
-            let customDesc;
+            let origDesc, customDesc;
+            function switchDesc(isCustom) {
+                descSwitch.checked = isCustom;
+                if (isCustom) {
+                    getDescBox();
+                    origDesc = descBox.innerHTML;
+                    descBox.classList.add('pepper-box');
+                    descBox.innerHTML = customDesc;
+                } else {
+                    descBox.classList.remove('pepper-box');
+                    descBox.innerHTML = origDesc;
+                }
+            }
 
             const genMessage = document.createElement('h3');
             genMessage.style.color = 'red';
@@ -92,17 +107,6 @@ if (prodID) {
                     .catch(error => {
                         console.error(error.message);
                     });
-            }
-
-            function switchDesc(isCustom) {
-                descSwitch.checked = isCustom;
-                if (isCustom) {
-                    descBox.classList.add('pepper-box');
-                    descBox.innerHTML = customDesc;
-                } else {
-                    descBox.classList.remove('pepper-box');
-                    descBox.innerHTML = origDesc;
-                }
             }
         });
     }
