@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const statusHead = 'Status Code: ';
     const responseHead = 'Response: ';
     const welcomeMsg = "Hi! I'm your personal shopping assistant.\nPlease tell me about your usage of the product so I can better assist you.";
-    // const api = 'http://127.0.0.1:5000/api/';
-    const api = 'https://dk1414.pythonanywhere.com/api/';
+    const api = 'http://127.0.0.1:5000/api/';
+    // const api = 'https://dk1414.pythonanywhere.com/api/';
 
     const loginPanel = document.getElementById('login');
     const ErrorMsg = document.getElementById('error-msg');
