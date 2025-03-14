@@ -55,8 +55,8 @@ if (prodID) {
                 chrome.storage.local.remove(prodIDKey);
                 genMessage.textContent = 'Generating description...';
 
-                const api = 'http://127.0.0.1:5000/api/';
-                // const api = 'https://dk1414.pythonanywhere.com/api/';
+                // const api = 'http://127.0.0.1:5000/api/';
+                const api = 'https://dk1414.pythonanywhere.com/api/';
                 fetch(`${api}shopping_sessions/${stored.session_id}/product_description`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
